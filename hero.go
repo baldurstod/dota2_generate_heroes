@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	_ "fmt"
 	"encoding/json"
 	"github.com/baldurstod/vdf"
 )
@@ -14,55 +14,63 @@ type hero struct {
 func (this *hero) MarshalJSON() ([]byte, error) {
 	ret :=  make(map[string]interface{})
 
-	fmt.Println("MarshalJSON", this.npc)
-
-	ret["id"] = this.npc
-	this.setIfExists(&ret, "Model")
-	this.setIfExists(&ret, "NameAliases")
-
-
-	//ret["Model"] = this.getStringAttribute("Model")
-
-	/*if s, ok := this.getStringAttribute("item_name"); ok {
-		ret["name"] = getStringToken(s)
-	}*/
-
+	ret["ID"] = this.npc
 	ret["Name"] = getStringToken(this.npc + ":n")
+	this.setIfExists(&this.attributes, &ret, "Model")
+	this.setIfExists(&this.attributes, &ret, "NameAliases")
+	this.setIfExists(&this.attributes, &ret, "HeroID")
+	this.setIfExists(&this.attributes, &ret, "HeroOrderID")
+	this.setIfExists(&this.attributes, &ret, "ModelScale")
+	this.setIfExists(&this.attributes, &ret, "LoadoutScale")
 
-	//$hero->name = getStringToken($heroId.':n');
-
-	//NameAliases
-
-
-	/*if s, ok := this.getStringAttribute("item_name"); ok {
-		ret["name"] = getStringToken(s)
-	}*/
-
-	/*for _, kv := range this.attributes {
-		//ret = append(kv.Key, kv.Value)
-		fmt.Println(kv.Key, kv.Value)
-		ret[kv.Key] = kv.Value
-	}*/
+	this.marshalSlots(&ret)
 
 	return json.Marshal(ret)
 }
 
-func (this *hero) setIfExists(ret *map[string]interface{}, attribute string) {
-	if s, ok := this.getStringAttribute(attribute); ok {
+func (this *hero) marshalSlots(ret *map[string]interface{}) {
+	slots := make(map[string]interface{})
+
+	if itemslots, ok := this.getAttribute("ItemSlots"); ok {
+		for _, kv := range itemslots {
+			slotAttributes := kv.Value.([]*vdf.KeyValue)
+			slot := make(map[string]interface{})
+
+			this.setIfExists(&slotAttributes, &slot, "SlotIndex")
+			this.setIfExists(&slotAttributes, &slot, "SlotName")
+			this.setIfExists(&slotAttributes, &slot, "SlotText")
+			this.setIfExists(&slotAttributes, &slot, "LoadoutPreviewMode")
+			this.setIfExists(&slotAttributes, &slot, "DisplayInLoadout")
+
+			slots[slot["SlotName"].(string)] = slot
+		}
+	}
+
+	if len(slots) > 0 {
+		(*ret)["ItemSlots"] = slots
+	}
+}
+
+func (this *hero) setIfExists(attributes *[]*vdf.KeyValue, ret *map[string]interface{}, attribute string) {
+	if s, ok := getStringAttribute(attributes, attribute); ok {
 		(*ret)[attribute] = getStringToken(s)
 	}
 }
 
-func (this *hero) getStringAttribute(attributeName string) (string, bool) {
-	for _, kv := range this.attributes {
+func getStringAttribute(attributes *[]*vdf.KeyValue, attributeName string) (string, bool) {
+	for _, kv := range *attributes {
 		if kv.Key == attributeName {
 			return kv.Value.(string), true
 		}
 	}
-
-/*
-	if s, ok := this.attributes.GetString(attributeName); ok {
-		return s, true
-	}*/
 	return "", false
+}
+
+func (this *hero) getAttribute(attributeName string) ([]*vdf.KeyValue, bool) {
+	for _, kv := range this.attributes {
+		if kv.Key == attributeName {
+			return kv.Value.([]*vdf.KeyValue), true
+		}
+	}
+	return nil, false
 }
