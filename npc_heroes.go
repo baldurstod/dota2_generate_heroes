@@ -6,10 +6,6 @@ import (
 	"encoding/json"
 )
 
-/*type itemMap map[string]*item
-type colorMap map[string]*color
-type particleMap map[string]*particle*/
-
 type npcHeroes struct {
 	heroesVDF *vdf.KeyValue
 	heroes map[string]*hero
@@ -29,7 +25,10 @@ func (this *npcHeroes) init(dat []byte) {
 }
 
 func (this *npcHeroes) addHero(kv *vdf.KeyValue) {
-	this.heroes[kv.Key] = &hero{npc: kv.Key, attributes: kv.Value.([]*vdf.KeyValue)}
+	h := &hero{npc: kv.Key, attributes: kv.Value.([]*vdf.KeyValue)}
+	if h.isHero() {
+		this.heroes[kv.Key] = h
+	}
 }
 
 func (this *npcHeroes) MarshalJSON() ([]byte, error) {

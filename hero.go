@@ -28,6 +28,11 @@ func (this *hero) MarshalJSON() ([]byte, error) {
 	return json.Marshal(ret)
 }
 
+func (this *hero) isHero() bool {
+	_, ok := getStringAttribute(&this.attributes, "HeroOrderID")
+	return ok
+}
+
 func (this *hero) marshalSlots(ret *map[string]interface{}) {
 	slots := make(map[string]interface{})
 
