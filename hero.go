@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "fmt"
 	"strconv"
 	"encoding/json"
 	"github.com/baldurstod/vdf"
@@ -26,6 +25,7 @@ func (this *hero) MarshalJSON() ([]byte, error) {
 	this.setIfExists(&this.attributes, &ret, "AttributePrimary")
 
 	this.marshalSlots(&ret)
+	this.marshalAdjectives(&ret)
 
 	return json.Marshal(ret)
 }
@@ -63,6 +63,19 @@ func (this *hero) marshalSlots(ret *map[string]interface{}) {
 
 	if len(slots) > 0 {
 		(*ret)["ItemSlots"] = slots
+	}
+}
+func (this *hero) marshalAdjectives(ret *map[string]interface{}) {
+	adjectives := make(map[string]interface{})
+
+	if adj, ok := this.getAttribute("Adjectives"); ok {
+		for _, kv := range adj {
+			adjectives[kv.Key] = kv.Value
+		}
+	}
+
+	if len(adjectives) > 0 {
+		(*ret)["Adjectives"] = adjectives
 	}
 }
 
