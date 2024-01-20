@@ -23,6 +23,7 @@ func (this *hero) MarshalJSON() ([]byte, error) {
 	this.setIfExists(&this.attributes, &ret, "HeroOrderID")
 	this.setIfExists(&this.attributes, &ret, "ModelScale")
 	this.setIfExists(&this.attributes, &ret, "LoadoutScale")
+	this.setIfExists(&this.attributes, &ret, "AttributePrimary")
 
 	this.marshalSlots(&ret)
 
