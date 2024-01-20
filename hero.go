@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "fmt"
+	"strconv"
 	"encoding/json"
 	"github.com/baldurstod/vdf"
 )
@@ -26,6 +27,14 @@ func (this *hero) MarshalJSON() ([]byte, error) {
 	this.marshalSlots(&ret)
 
 	return json.Marshal(ret)
+}
+
+func (this *hero) getHeroOrderId() int {
+	if s, ok := getStringAttribute(&this.attributes, "HeroOrderID"); ok {
+		i, _ := strconv.Atoi(s)
+		return i
+	}
+	return -1
 }
 
 func (this *hero) isHero() bool {

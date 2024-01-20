@@ -2,6 +2,7 @@ package main
 
 import (
 	"strings"
+	"sort"
 	"github.com/baldurstod/vdf"
 	"encoding/json"
 )
@@ -34,8 +35,20 @@ func (this *npcHeroes) addHero(kv *vdf.KeyValue) {
 func (this *npcHeroes) MarshalJSON() ([]byte, error) {
 	ret := []interface{}{}
 
-	for _, val := range this.heroes {
-		ret = append(ret, val)
+	orderToNPC := make(map[int]string)
+
+
+	// Sort keys
+	keys := make([]int, 0, len(this.heroes))
+	for k, h := range this.heroes {
+		heroOrderId := h.getHeroOrderId()
+		orderToNPC[heroOrderId] = k
+		keys = append(keys, heroOrderId)
+	}
+	sort.Ints(keys)
+
+	for _, k := range keys {
+		ret = append(ret, this.heroes[orderToNPC[k]])
 	}
 
 	return json.Marshal(ret)
