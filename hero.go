@@ -17,6 +17,9 @@ func (this *hero) MarshalJSON() ([]byte, error) {
 	ret["ID"] = this.npc
 	ret["Name"] = getStringToken(this.npc + ":n")
 	this.setIfExists(&this.attributes, &ret, "Model")
+	this.setIfExists(&this.attributes, &ret, "Model1")
+	this.setIfExists(&this.attributes, &ret, "Model2")
+	this.setIfExists(&this.attributes, &ret, "Model3")
 	this.setIfExists(&this.attributes, &ret, "NameAliases")
 	this.setIfExists(&this.attributes, &ret, "HeroID")
 	this.setIfExists(&this.attributes, &ret, "HeroOrderID")
