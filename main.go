@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"os"
-	_ "log"
 	"flag"
 	"fmt"
+	_ "log"
+	"os"
 	"path"
 )
 
@@ -39,10 +39,10 @@ func main() {
 	}
 
 	lg = language{}
-	lg.init(path.Join(resourceFolder, "abilities_" + lang + ".txt"))
+	lg.init(path.Join(resourceFolder, "abilities_"+lang+".txt"))
 
 	dota = language{}
-	dota.init(path.Join(resourceFolder, "dota_" + lang + ".txt"))
+	dota.init(path.Join(resourceFolder, "dota_"+lang+".txt"))
 
 	languages = []*language{&lg, &dota}
 
@@ -52,28 +52,13 @@ func main() {
 
 	j, _ := json.MarshalIndent(&heroes, "", "\t")
 	os.WriteFile(path.Join(outputFolder, "heroes.json"), j, 0666)
-
-/*
-	heroes := ig.getItemsPerHero()
-
-	for npc, hero := range heroes {
-		j, _ := json.MarshalIndent(hero, "", "\t")
-		os.WriteFile(path.Join(outputFolder, npc + ".json"), j, 0666)
-	}
-
-	j, _ := json.MarshalIndent(ig.getColors(), "", "\t")
-	os.WriteFile(path.Join(outputFolder, "colors.json"), j, 0666)
-
-	p, _ := json.MarshalIndent(ig.getParticles(), "", "\t")
-	os.WriteFile(path.Join(outputFolder, "particles.json"), p, 0666)
-	*/
 }
 
 func getStringToken(token string) string {
 	for _, language := range languages {
 		s, exist := language.getToken(token)
 
-		if (exist) {
+		if exist {
 			return s
 		}
 	}

@@ -1,13 +1,13 @@
 package main
 
 import (
+	"github.com/baldurstod/vdf"
 	"os"
 	"strings"
-	"github.com/baldurstod/vdf"
 )
 
 type language struct {
-	lang string
+	lang   string
 	tokens map[string]string
 }
 
@@ -36,7 +36,6 @@ func (this *language) init(path string) {
 		this.tokens[strings.ToLower(val.Key)] = val.Value.(string)
 	}
 }
-
 
 func (this *language) getToken(token string) (string, bool) {
 	token = strings.TrimPrefix(token, "#")

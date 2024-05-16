@@ -1,15 +1,15 @@
 package main
 
 import (
-	"strings"
-	"sort"
-	"github.com/baldurstod/vdf"
 	"encoding/json"
+	"github.com/baldurstod/vdf"
+	"sort"
+	"strings"
 )
 
 type npcHeroes struct {
 	heroesVDF *vdf.KeyValue
-	heroes map[string]*hero
+	heroes    map[string]*hero
 }
 
 func (this *npcHeroes) init(dat []byte) {
@@ -36,7 +36,6 @@ func (this *npcHeroes) MarshalJSON() ([]byte, error) {
 	ret := []interface{}{}
 
 	orderToNPC := make(map[int]string)
-
 
 	// Sort keys
 	keys := make([]int, 0, len(this.heroes))

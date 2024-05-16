@@ -1,18 +1,18 @@
 package main
 
 import (
-	"strconv"
 	"encoding/json"
 	"github.com/baldurstod/vdf"
+	"strconv"
 )
 
 type hero struct {
-	npc string
+	npc        string
 	attributes []*vdf.KeyValue
 }
 
 func (this *hero) MarshalJSON() ([]byte, error) {
-	ret :=  make(map[string]interface{})
+	ret := make(map[string]interface{})
 
 	ret["ID"] = this.npc
 	ret["Name"] = getStringToken(this.npc + ":n")
@@ -49,7 +49,7 @@ func (this *hero) isHero() bool {
 func (this *hero) marshalSlots(ret *map[string]interface{}) {
 	slots := make(map[string]interface{})
 
-	if itemslots, ok := this.getAttribute("ItemSlots"); ok {
+	if itemslots, ok := getAttribute(&this.attributes, "ItemSlots"); ok {
 		for _, kv := range itemslots {
 			slotAttributes := kv.Value.([]*vdf.KeyValue)
 			slot := make(map[string]interface{})
@@ -59,6 +59,13 @@ func (this *hero) marshalSlots(ret *map[string]interface{}) {
 			this.setIfExists(&slotAttributes, &slot, "SlotText")
 			this.setIfExists(&slotAttributes, &slot, "LoadoutPreviewMode")
 			this.setIfExists(&slotAttributes, &slot, "DisplayInLoadout")
+			if generatesUnits, ok := getAttribute(&slotAttributes, "GeneratesUnits"); ok {
+				units := make(map[string]interface{})
+				for _, kv := range generatesUnits {
+					units[kv.Key] = kv.Value
+				}
+				slot["GeneratesUnits"] = units
+			}
 
 			slots[slot["SlotName"].(string)] = slot
 		}
@@ -71,7 +78,7 @@ func (this *hero) marshalSlots(ret *map[string]interface{}) {
 func (this *hero) marshalAdjectives(ret *map[string]interface{}) {
 	adjectives := make(map[string]interface{})
 
-	if adj, ok := this.getAttribute("Adjectives"); ok {
+	if adj, ok := getAttribute(&this.attributes, "Adjectives"); ok {
 		for _, kv := range adj {
 			adjectives[kv.Key] = kv.Value
 		}
@@ -97,8 +104,8 @@ func getStringAttribute(attributes *[]*vdf.KeyValue, attributeName string) (stri
 	return "", false
 }
 
-func (this *hero) getAttribute(attributeName string) ([]*vdf.KeyValue, bool) {
-	for _, kv := range this.attributes {
+func getAttribute(attributes *[]*vdf.KeyValue, attributeName string) ([]*vdf.KeyValue, bool) {
+	for _, kv := range *attributes {
 		if kv.Key == attributeName {
 			return kv.Value.([]*vdf.KeyValue), true
 		}
