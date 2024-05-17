@@ -48,7 +48,8 @@ func main() {
 
 	heroes := npcHeroes{}
 	npcHeroesDatas, _ := os.ReadFile(path.Join(inputFolder, "npc_heroes.txt"))
-	heroes.init(npcHeroesDatas)
+	npcUnitsDatas, _ := os.ReadFile(path.Join(inputFolder, "npc_units.txt"))
+	heroes.init(npcHeroesDatas, npcUnitsDatas)
 
 	j, _ := json.MarshalIndent(&heroes, "", "\t")
 	os.WriteFile(path.Join(outputFolder, "heroes.json"), j, 0666)
