@@ -15,6 +15,7 @@ func (u *unit) MarshalJSON() ([]byte, error) {
 
 	u.setIfExists(&u.attributes, &ret, "Model")
 	u.setIfExists(&u.attributes, &ret, "include_keys_from")
+	ret["name"] = getStringToken(u.npc)
 
 	return json.Marshal(ret)
 }
