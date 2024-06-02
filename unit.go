@@ -14,6 +14,7 @@ func (u *unit) MarshalJSON() ([]byte, error) {
 	ret := make(map[string]interface{})
 
 	u.setIfExists(&u.attributes, &ret, "Model")
+	u.setIfExists(&u.attributes, &ret, "IsNeutralUnitType")
 	u.setIfExists(&u.attributes, &ret, "include_keys_from")
 	ret["name"] = getStringToken(u.npc)
 
