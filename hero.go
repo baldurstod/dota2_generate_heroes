@@ -39,11 +39,15 @@ func (h *hero) getHeroOrderId() int {
 		i, _ := strconv.Atoi(s)
 		return i
 	}
-	return -1
+	if s, ok := getStringAttribute(&h.attributes, "HeroID"); ok {
+		i, _ := strconv.Atoi(s)
+		return i
+	}
+	return 1000
 }
 
 func (h *hero) isHero() bool {
-	_, ok := getStringAttribute(&h.attributes, "HeroOrderID")
+	_, ok := getStringAttribute(&h.attributes, "HeroID")
 	return ok
 }
 
