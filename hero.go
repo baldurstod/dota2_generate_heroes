@@ -2,8 +2,9 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/baldurstod/vdf"
 	"strconv"
+
+	"github.com/baldurstod/vdf"
 )
 
 type hero struct {
@@ -11,54 +12,54 @@ type hero struct {
 	attributes []*vdf.KeyValue
 }
 
-func (this *hero) MarshalJSON() ([]byte, error) {
+func (h *hero) MarshalJSON() ([]byte, error) {
 	ret := make(map[string]interface{})
 
-	ret["ID"] = this.npc
-	ret["Name"] = getStringToken(this.npc + ":n")
-	this.setIfExists(&this.attributes, &ret, "Model")
-	this.setIfExists(&this.attributes, &ret, "Model1")
-	this.setIfExists(&this.attributes, &ret, "Model2")
-	this.setIfExists(&this.attributes, &ret, "Model3")
-	this.setIfExists(&this.attributes, &ret, "NameAliases")
-	this.setIfExists(&this.attributes, &ret, "HeroID")
-	this.setIfExists(&this.attributes, &ret, "HeroOrderID")
-	this.setIfExists(&this.attributes, &ret, "ModelScale")
-	this.setIfExists(&this.attributes, &ret, "LoadoutScale")
-	this.setIfExists(&this.attributes, &ret, "AttributePrimary")
+	ret["ID"] = h.npc
+	ret["Name"] = getStringToken(h.npc + ":n")
+	h.setIfExists(&h.attributes, &ret, "Model")
+	h.setIfExists(&h.attributes, &ret, "Model1")
+	h.setIfExists(&h.attributes, &ret, "Model2")
+	h.setIfExists(&h.attributes, &ret, "Model3")
+	h.setIfExists(&h.attributes, &ret, "NameAliases")
+	h.setIfExists(&h.attributes, &ret, "HeroID")
+	h.setIfExists(&h.attributes, &ret, "HeroOrderID")
+	h.setIfExists(&h.attributes, &ret, "ModelScale")
+	h.setIfExists(&h.attributes, &ret, "LoadoutScale")
+	h.setIfExists(&h.attributes, &ret, "AttributePrimary")
 
-	this.marshalSlots(&ret)
-	this.marshalAdjectives(&ret)
+	h.marshalSlots(&ret)
+	h.marshalAdjectives(&ret)
 
 	return json.Marshal(ret)
 }
 
-func (this *hero) getHeroOrderId() int {
-	if s, ok := getStringAttribute(&this.attributes, "HeroOrderID"); ok {
+func (h *hero) getHeroOrderId() int {
+	if s, ok := getStringAttribute(&h.attributes, "HeroOrderID"); ok {
 		i, _ := strconv.Atoi(s)
 		return i
 	}
 	return -1
 }
 
-func (this *hero) isHero() bool {
-	_, ok := getStringAttribute(&this.attributes, "HeroOrderID")
+func (h *hero) isHero() bool {
+	_, ok := getStringAttribute(&h.attributes, "HeroOrderID")
 	return ok
 }
 
-func (this *hero) marshalSlots(ret *map[string]interface{}) {
+func (h *hero) marshalSlots(ret *map[string]interface{}) {
 	slots := make(map[string]interface{})
 
-	if itemslots, ok := getAttribute(&this.attributes, "ItemSlots"); ok {
+	if itemslots, ok := getAttribute(&h.attributes, "ItemSlots"); ok {
 		for _, kv := range itemslots {
 			slotAttributes := kv.Value.([]*vdf.KeyValue)
 			slot := make(map[string]interface{})
 
-			this.setIfExists(&slotAttributes, &slot, "SlotIndex")
-			this.setIfExists(&slotAttributes, &slot, "SlotName")
-			this.setIfExists(&slotAttributes, &slot, "SlotText")
-			this.setIfExists(&slotAttributes, &slot, "LoadoutPreviewMode")
-			this.setIfExists(&slotAttributes, &slot, "DisplayInLoadout")
+			h.setIfExists(&slotAttributes, &slot, "SlotIndex")
+			h.setIfExists(&slotAttributes, &slot, "SlotName")
+			h.setIfExists(&slotAttributes, &slot, "SlotText")
+			h.setIfExists(&slotAttributes, &slot, "LoadoutPreviewMode")
+			h.setIfExists(&slotAttributes, &slot, "DisplayInLoadout")
 			if generatesUnits, ok := getAttribute(&slotAttributes, "GeneratesUnits"); ok {
 				units := make(map[string]interface{})
 				for _, kv := range generatesUnits {
@@ -75,10 +76,10 @@ func (this *hero) marshalSlots(ret *map[string]interface{}) {
 		(*ret)["ItemSlots"] = slots
 	}
 }
-func (this *hero) marshalAdjectives(ret *map[string]interface{}) {
+func (h *hero) marshalAdjectives(ret *map[string]interface{}) {
 	adjectives := make(map[string]interface{})
 
-	if adj, ok := getAttribute(&this.attributes, "Adjectives"); ok {
+	if adj, ok := getAttribute(&h.attributes, "Adjectives"); ok {
 		for _, kv := range adj {
 			adjectives[kv.Key] = kv.Value
 		}
@@ -89,7 +90,7 @@ func (this *hero) marshalAdjectives(ret *map[string]interface{}) {
 	}
 }
 
-func (this *hero) setIfExists(attributes *[]*vdf.KeyValue, ret *map[string]interface{}, attribute string) {
+func (h *hero) setIfExists(attributes *[]*vdf.KeyValue, ret *map[string]interface{}, attribute string) {
 	if s, ok := getStringAttribute(attributes, attribute); ok {
 		(*ret)[attribute] = getStringToken(s)
 	}

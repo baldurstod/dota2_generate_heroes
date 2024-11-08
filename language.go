@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/baldurstod/vdf"
 	"os"
 	"strings"
+
+	"github.com/baldurstod/vdf"
 )
 
 type language struct {
@@ -11,7 +12,7 @@ type language struct {
 	tokens map[string]string
 }
 
-func (this *language) init(path string) {
+func (lg *language) init(path string) {
 	dat, _ := os.ReadFile(path)
 	v := vdf.VDF{}
 	languageVdf := v.Parse(dat)
@@ -30,15 +31,15 @@ func (this *language) init(path string) {
 		panic("Tokens key not found")
 	}
 
-	this.lang = language
-	this.tokens = make(map[string]string)
+	lg.lang = language
+	lg.tokens = make(map[string]string)
 	for _, val := range tokens.Value.([]*vdf.KeyValue) {
-		this.tokens[strings.ToLower(val.Key)] = val.Value.(string)
+		lg.tokens[strings.ToLower(val.Key)] = val.Value.(string)
 	}
 }
 
-func (this *language) getToken(token string) (string, bool) {
+func (lg *language) getToken(token string) (string, bool) {
 	token = strings.TrimPrefix(token, "#")
-	s, ok := this.tokens[strings.ToLower(token)]
+	s, ok := lg.tokens[strings.ToLower(token)]
 	return s, ok
 }

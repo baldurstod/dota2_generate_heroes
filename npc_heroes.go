@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/baldurstod/vdf"
 	"sort"
 	"strings"
+
+	"github.com/baldurstod/vdf"
 )
 
 type npcHeroes struct {
@@ -13,50 +14,50 @@ type npcHeroes struct {
 	units     map[string]*unit
 }
 
-func (this *npcHeroes) init(heroes []byte, units []byte) {
-	this.initHeroes(heroes)
-	this.initUnits(units)
+func (npcHeroes *npcHeroes) init(heroes []byte, units []byte) {
+	npcHeroes.initHeroes(heroes)
+	npcHeroes.initUnits(units)
 }
 
-func (this *npcHeroes) initHeroes(heroes []byte) {
+func (npcHeroes *npcHeroes) initHeroes(heroes []byte) {
 	vdf := vdf.VDF{}
 	root := vdf.Parse(heroes)
-	this.heroes = make(map[string]*hero)
-	this.heroesVDF, _ = root.Get("DOTAHeroes")
+	npcHeroes.heroes = make(map[string]*hero)
+	npcHeroes.heroesVDF, _ = root.Get("DOTAHeroes")
 
-	for _, hero := range this.heroesVDF.GetChilds() {
+	for _, hero := range npcHeroes.heroesVDF.GetChilds() {
 		if strings.HasPrefix(hero.Key, "npc_") {
-			this.addHero(hero)
+			npcHeroes.addHero(hero)
 		}
 	}
 }
 
-func (this *npcHeroes) initUnits(units []byte) {
+func (npcHeroes *npcHeroes) initUnits(units []byte) {
 	vdf := vdf.VDF{}
 	root := vdf.Parse(units)
-	this.units = make(map[string]*unit)
-	this.heroesVDF, _ = root.Get("DOTAUnits")
+	npcHeroes.units = make(map[string]*unit)
+	npcHeroes.heroesVDF, _ = root.Get("DOTAUnits")
 
-	for _, unit := range this.heroesVDF.GetChilds() {
+	for _, unit := range npcHeroes.heroesVDF.GetChilds() {
 		if strings.HasPrefix(unit.Key, "npc_dota_") {
-			this.addUnit(unit)
+			npcHeroes.addUnit(unit)
 		}
 	}
 }
 
-func (this *npcHeroes) addHero(kv *vdf.KeyValue) {
+func (npcHeroes *npcHeroes) addHero(kv *vdf.KeyValue) {
 	h := &hero{npc: kv.Key, attributes: kv.Value.([]*vdf.KeyValue)}
 	if h.isHero() {
-		this.heroes[kv.Key] = h
+		npcHeroes.heroes[kv.Key] = h
 	}
 }
 
-func (this *npcHeroes) addUnit(kv *vdf.KeyValue) {
+func (npcHeroes *npcHeroes) addUnit(kv *vdf.KeyValue) {
 	h := &unit{npc: kv.Key, attributes: kv.Value.([]*vdf.KeyValue)}
-	this.units[kv.Key] = h
+	npcHeroes.units[kv.Key] = h
 }
 
-func (this *npcHeroes) MarshalJSON() ([]byte, error) {
+func (npcHeroes *npcHeroes) MarshalJSON() ([]byte, error) {
 	heroes := []interface{}{}
 	units := map[string]interface{}{}
 	ret := map[string]interface{}{
@@ -67,8 +68,8 @@ func (this *npcHeroes) MarshalJSON() ([]byte, error) {
 	orderToNPC := make(map[int]string)
 
 	// Sort keys
-	keys := make([]int, 0, len(this.heroes))
-	for k, h := range this.heroes {
+	keys := make([]int, 0, len(npcHeroes.heroes))
+	for k, h := range npcHeroes.heroes {
 		heroOrderId := h.getHeroOrderId()
 		orderToNPC[heroOrderId] = k
 		keys = append(keys, heroOrderId)
@@ -76,16 +77,16 @@ func (this *npcHeroes) MarshalJSON() ([]byte, error) {
 	sort.Ints(keys)
 
 	for _, k := range keys {
-		heroes = append(heroes, this.heroes[orderToNPC[k]])
+		heroes = append(heroes, npcHeroes.heroes[orderToNPC[k]])
 	}
 
-	this.marshalUnits(&units)
+	npcHeroes.marshalUnits(&units)
 
 	return json.Marshal(ret)
 }
 
-func (this *npcHeroes) marshalUnits(units *map[string]interface{}) {
-	for k, h := range this.units {
+func (npcHeroes *npcHeroes) marshalUnits(units *map[string]interface{}) {
+	for k, h := range npcHeroes.units {
 		(*units)[k] = h
 	}
 }
