@@ -48,6 +48,11 @@ func (h *hero) getHeroOrderId() int {
 
 func (h *hero) isHero() bool {
 	_, ok := getStringAttribute(&h.attributes, "HeroID")
+
+	if h.npc == "npc_dota_hero_target_dummy" {
+		return false
+	}
+
 	return ok
 }
 
