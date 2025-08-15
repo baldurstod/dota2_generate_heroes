@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -12,8 +13,12 @@ type language struct {
 	tokens map[string]string
 }
 
-func (lg *language) init(path string) {
-	dat, _ := os.ReadFile(path)
+func (lg *language) init(path string) error {
+	dat, err := os.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("unable to read file %s: %w", path, err)
+	}
+
 	v := vdf.VDF{}
 	languageVdf := v.Parse(dat)
 
@@ -36,6 +41,7 @@ func (lg *language) init(path string) {
 	for _, val := range tokens.Value.([]*vdf.KeyValue) {
 		lg.tokens[strings.ToLower(val.Key)] = val.Value.(string)
 	}
+	return nil
 }
 
 func (lg *language) getToken(token string) (string, bool) {
