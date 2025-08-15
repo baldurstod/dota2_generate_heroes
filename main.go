@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	_ "log"
 	"os"
 	"path"
 )
