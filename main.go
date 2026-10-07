@@ -13,6 +13,15 @@ var lg language
 var dota language
 var languages []*language
 
+func GetFileContent(filepath string) ([]byte, error) {
+	dat, err := os.ReadFile(path.Join("./var/", filepath))
+	if err != nil {
+		return nil, err
+	}
+
+	return dat, nil
+}
+
 func main() {
 	var lang string
 	var outputFolder string
@@ -63,7 +72,7 @@ func main() {
 		log.Println(err)
 		return
 	}
-	heroes.init(npcHeroesDatas, npcUnitsDatas)
+	heroes.init(npcHeroesDatas, npcUnitsDatas, GetFileContent)
 
 	j, _ := json.MarshalIndent(&heroes, "", "\t")
 	os.WriteFile(path.Join(outputFolder, "heroes.json"), j, 0666)

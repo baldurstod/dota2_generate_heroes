@@ -14,14 +14,14 @@ type npcHeroes struct {
 	units     map[string]*unit
 }
 
-func (npcHeroes *npcHeroes) init(heroes []byte, units []byte) {
-	npcHeroes.initHeroes(heroes)
+func (npcHeroes *npcHeroes) init(heroes []byte, units []byte, getFileContent vdf.GetFileContent) {
+	npcHeroes.initHeroes(heroes, getFileContent)
 	npcHeroes.initUnits(units)
 }
 
-func (npcHeroes *npcHeroes) initHeroes(heroes []byte) {
+func (npcHeroes *npcHeroes) initHeroes(heroes []byte, getFileContent vdf.GetFileContent) {
 	vdf := vdf.VDF{}
-	root := vdf.Parse(heroes)
+	root := vdf.Parse(heroes, getFileContent)
 	npcHeroes.heroes = make(map[string]*hero)
 	npcHeroes.heroesVDF, _ = root.Get("DOTAHeroes")
 
@@ -34,7 +34,7 @@ func (npcHeroes *npcHeroes) initHeroes(heroes []byte) {
 
 func (npcHeroes *npcHeroes) initUnits(units []byte) {
 	vdf := vdf.VDF{}
-	root := vdf.Parse(units)
+	root := vdf.Parse(units, nil)
 	npcHeroes.units = make(map[string]*unit)
 	npcHeroes.heroesVDF, _ = root.Get("DOTAUnits")
 
@@ -46,14 +46,14 @@ func (npcHeroes *npcHeroes) initUnits(units []byte) {
 }
 
 func (npcHeroes *npcHeroes) addHero(kv *vdf.KeyValue) {
-	h := &hero{npc: kv.Key, attributes: kv.Value.([]*vdf.KeyValue)}
+	h := &hero{npc: kv.Key, attributes: kv.GetValue().(map[string][]*vdf.KeyValue)}
 	if h.isHero() {
 		npcHeroes.heroes[kv.Key] = h
 	}
 }
 
 func (npcHeroes *npcHeroes) addUnit(kv *vdf.KeyValue) {
-	h := &unit{npc: kv.Key, attributes: kv.Value.([]*vdf.KeyValue)}
+	h := &unit{npc: kv.Key, attributes: kv.GetValue().(map[string][]*vdf.KeyValue)}
 	npcHeroes.units[kv.Key] = h
 }
 

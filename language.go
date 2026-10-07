@@ -20,26 +20,28 @@ func (lg *language) init(path string) error {
 	}
 
 	v := vdf.VDF{}
-	languageVdf := v.Parse(dat)
+	languageVdf := v.Parse(dat, nil)
 
-	lang, ok := languageVdf.Get("lang")
-	if !ok {
+	lang, err := languageVdf.Get("lang")
+	if err != nil {
 		panic("lang key not found")
 	}
-	language, ok := lang.GetString("Language")
-	if !ok {
+	language, err := lang.GetString("Language")
+	if err != nil {
 		panic("Language key not found")
 	}
 
-	tokens, ok := lang.Get("Tokens")
-	if !ok {
+	tokens, err := lang.Get("Tokens")
+	if err != nil {
 		panic("Tokens key not found")
 	}
 
 	lg.lang = language
 	lg.tokens = make(map[string]string)
-	for _, val := range tokens.Value.([]*vdf.KeyValue) {
-		lg.tokens[strings.ToLower(val.Key)] = val.Value.(string)
+	for _, val := range tokens.GetValue().(map[string][]*vdf.KeyValue) {
+		for _, val2 := range val {
+			lg.tokens[strings.ToLower(val2.Key)] = val2.GetValue().(string)
+		}
 	}
 	return nil
 }
